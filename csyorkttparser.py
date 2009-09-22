@@ -88,7 +88,7 @@ def parse_weeks(weeks):
 		return [int(x) for x in weeks.split(" ")]
 	if len(weeks.split("-")) > 1:
 		r = weeks.split("-")
-		return range(int(r[0]), int(r[1]))
+		return range(int(r[0]), int(r[1])+1)
 	return [int(weeks)]
 
 def calculate_date(week, day, hour):
