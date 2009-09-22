@@ -24,6 +24,8 @@ How to use it
 5.  Run csyorkttparser.py and tell it your modules.
 6.  Profit!
 
+[ic]: http://codespeak.net/icalendar/
+
 
 How to help
 -----------
