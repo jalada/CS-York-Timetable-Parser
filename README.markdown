@@ -14,8 +14,8 @@ How to use it
 
 1.  Download your timetable file (in HTML format). timetable.html here is
     the 3rd year timetable
-2.  Hack it about a bit: remove all <center> and </center> tags, the day headers
-    and any other cruft around the <table>. Anything that isn't a 3 letter module
+2.  Hack it about a bit: remove all &lt;center&gt; and &lt;/center&gt; tags, the day headers
+    and any other cruft around the %lt;table%gt;. Anything that isn't a 3 letter module
     needs to go (e.g. things called Talk2) or changed to a 3 letter module (the
     code relies on looking for 3 letter acronyms).
 3.  Save it as timetable.html (or adjust the source code of parser.py)
