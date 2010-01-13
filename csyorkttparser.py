@@ -34,65 +34,80 @@ def leaf( tag ):
 	return o
 
 def trow_cols( trow, time, cal, td="td" ):
-    row = 0
-    cols = []
-    for col in trow( td ):
-        data = leaf( col )
-	# There's not quite enough indentation here.
-	if len(data) > 0:
-		for i in data:
-			if len(i) > 0:
-				for j in range(2, len(i)):
-					# Hackish way of finding the right thing
-					if i[j].startswith("LECT") or i[j].startswith("PRAC"):
-						module = i[0]
-						room = i[1]
-						k = i[j].split(None, 1)
-						type = k[0]
-						weeks = k[1]
-						lecturer = i[j+1]
-				if module in modules:
-					print "  Module:",module
-					if type == "LECT":
-						type = "Lecture"
-					else:
-						type = "Practical"
-					print "  Type:",type
-					print "  Time:",time
-					print "  Day:",days[row]
-					print "  Room:",room
-					print "  Weeks:",parse_weeks(weeks)
-					# I come from Erlang, I need list comprehensions
-					dates = [calculate_date(x, days[row], time) for x in parse_weeks(weeks)]
-					print "  Lecturer:",lecturer
-					# I've guessed that this is probably OK
-					datestr = "%Y%m%dT%H%M%SZ/123123123@protane.co.uk"
-					for l in dates:
-						event = Event()
-						event.add('summary', module + " " + type)
-						event.add('location', room)
-						event.add('dtstart', l)
-						event.add('dtend', l + timedelta(hours=1))
-						event.add('dtstamp', datetime.now())
-						event['uid'] = l.strftime(datestr)
-						cal.add_component(event)
-					print 			 
-		row = row + 1
+	row = 0
+	cols = []
+	for col in trow( td ):
+		data = leaf( col )
+		# There's not quite enough indentation here.
+		if len(data) > 0:
+			for i in data:
+				if len(i) > 0:
+					for j in range(2, len(i)):
+						# Hackish way of finding the right thing
+						if i[j].startswith("LECT") or i[j].startswith("PRAC"):
+							module = i[0]
+							room = i[1]
+							k = i[j].split(None, 1)
+							type = k[0]
+							weeks = k[1]
+							try:
+								lecturer = i[j+1]
+							except IndexError:
+								lecturer = "None"
+					if module in modules:
+						print "  Module:",module
+						if type == "LECT":
+							type = "Lecture"
+						else:
+							type = "Practical"
+						print "  Type:",type
+						print "  Time:",time
+						print "  Day:",days[row]
+						print "  Room:",room
+						print "  Weeks:",parse_weeks(weeks)
+						# I come from Erlang, I need list comprehensions
+						dates = [calculate_date(x, days[row], time) for x in parse_weeks(weeks)]
+						print "  Lecturer:",lecturer
+						# I've guessed that this is probably OK
+						datestr = "%Y%m%dT%H%M%SZ/123123123@protane.co.uk"
+						for l in dates:
+							event = Event()
+							event.add('summary', module + " " + type)
+							event.add('location', room)
+							event.add('dtstart', l)
+							event.add('dtend', l + timedelta(hours=1))
+							event.add('dtstamp', datetime.now())
+							event['uid'] = l.strftime(datestr)
+							cal.add_component(event)
+						print 			 
+			row = row + 1
+		else:
+			if row != 0:
+				row = row + 1
 		
-    return cal
+	return cal
 
 def parse_weeks(weeks):
 	# Remove stuff. I bet there's a nicer way to do this
-	weeks = weeks.replace("au", "").replace("\"", "").replace(",", "").replace("wks", "")
+	weeks = weeks.replace("au", "").replace("\"", "").replace(",", "").replace("wks", "").replace("sp", "")
 	if len(weeks.split(" ")) > 1:
-		return [int(x) for x in weeks.split(" ")]
+		w = weeks.split(" ")
+		results = []
+		for week in w:
+			if len(week.split("-")) > 1:
+				r = week.split("-")
+				results.extend(range(int(r[0]), int(r[1])+1))
+			else:
+				results.append(int(week))
+		return (results)
 	if len(weeks.split("-")) > 1:
 		r = weeks.split("-")
 		return range(int(r[0]), int(r[1])+1)
 	return [int(weeks)]
 
 def calculate_date(week, day, hour):
-	date = datetime(2009, 10, 12, 0, 0)
+	# Start date goes here
+	date = datetime(2010, 1, 11, 0, 0)
 	date = date + timedelta((7 * (week - 1)) + day)
 	date = date + timedelta(hours=hour, minutes=15)
 	return to_utc(date)
